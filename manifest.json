@@ -1,0 +1,13 @@
+{
+  "name": "CheckBox",
+  "short_name": "CheckBox",
+  "description": "Listas de verificação simples para viagens, mercearia e mais.",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#1F4B43",
+  "background_color": "#F1ECDF",
+  "display": "standalone",
+  "start_url": "."
+}
