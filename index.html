@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckBox</title>
+<link rel="icon" id="favicon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F1ECDF;
+    --paper: #FBF8F1;
+    --ink: #1C2B28;
+    --pine: #1F4B43;
+    --pine-light: #2F6358;
+    --mustard: #D3A125;
+    --rust: #A83E32;
+    --line: #D8CEB8;
+    --muted: #6B6255;
+    --radius: 10px;
+    --shadow: 0 2px 10px rgba(28,43,40,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-size:11px;
+    color:var(--muted);
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; margin:0; }
+  button{ font-family:'Inter', sans-serif; cursor:pointer; }
+  input, select{ font-family:'Inter', sans-serif; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:var(--pine);
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:var(--shadow);
+    gap:10px;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand{ display:flex; align-items:center; gap:9px; min-width:0; }
+  .brand img, .brand svg{ width:28px; height:28px; flex:none; }
+  .brand-name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .icon-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    color:var(--paper);
+    border-radius:8px;
+    width:40px;height:40px;
+    flex:none;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .icon-btn:hover{ background:rgba(255,255,255,0.18); }
+  .icon-btn:active{ transform:scale(0.94); }
+  .icon-btn svg{ width:19px;height:19px; stroke:var(--paper); }
+  .topbar-title{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:.06em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:640px;
+    margin:0 auto;
+    padding:28px 18px 8px;
+  }
+  .hero h1{
+    font-size:32px;
+    font-weight:600;
+    line-height:1.08;
+  }
+  .hero .sub{
+    color:var(--muted);
+    margin-top:6px;
+    font-size:14.5px;
+  }
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:16px;
+  }
+  .progress-track{
+    flex:1;
+    height:6px;
+    background:var(--line);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--mustard);
+    transition:width .25s ease;
+  }
+  .progress-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .uncheck-link{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:14px;
+    background:transparent;
+    border:1px dashed var(--line);
+    color:var(--muted);
+    font-size:12.5px;
+    padding:7px 12px;
+    border-radius:20px;
+    transition:all .15s ease;
+  }
+  .uncheck-link:hover{ border-color:var(--rust); color:var(--rust); }
+  .uncheck-link svg{ width:13px; height:13px; stroke:currentColor; }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    max-width:640px;
+    margin:0 auto;
+    padding:18px 18px 4px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .search-wrap{
+    flex:1;
+    position:relative;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:12px; top:50%;
+    transform:translateY(-50%);
+    width:16px;height:16px;
+    stroke:var(--muted);
+  }
+  .search-wrap input{
+    width:100%;
+    padding:10px 12px 10px 34px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    font-size:14px;
+    color:var(--ink);
+  }
+  .search-wrap input:focus{ outline:2px solid var(--pine-light); outline-offset:1px; }
+  .filter-chip{
+    display:flex; align-items:center; gap:6px;
+    padding:9px 13px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    font-size:13px;
+    color:var(--muted);
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .filter-chip.active{
+    background:var(--pine);
+    border-color:var(--pine);
+    color:var(--paper);
+  }
+  .filter-chip input{ display:none; }
+
+  /* ---------- List (items) ---------- */
+  .list-wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:16px 18px 60px;
+  }
+  .category-block{ margin-bottom:22px; }
+  .category-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--pine);
+    background:rgba(31,75,67,0.08);
+    border:1px dashed var(--pine-light);
+    padding:5px 10px 5px 8px;
+    border-radius:20px;
+    margin-bottom:10px;
+    transform:rotate(-0.6deg);
+  }
+  .category-tag .dot{ width:6px;height:6px;border-radius:50%; background:var(--mustard); }
+  .items-card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .item-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    border-bottom:1px dashed var(--line);
+    transition:background .12s ease;
+    cursor:pointer;
+  }
+  .item-row:last-child{ border-bottom:none; }
+  .item-row:hover{ background:#F5F1E6; }
+  .stamp{
+    flex:none;
+    width:26px;height:26px;
+    border-radius:50%;
+    border:2px solid var(--pine-light);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .15s ease, border-color .15s ease;
+    background:transparent;
+  }
+  .stamp svg{
+    width:14px;height:14px;
+    stroke:var(--paper);
+    opacity:0;
+    transform:scale(0.5);
+    transition:opacity .12s ease, transform .18s ease;
+  }
+  .item-row.checked .stamp{
+    background:var(--rust);
+    border-color:var(--rust);
+    transform:rotate(-8deg) scale(1.04);
+  }
+  .item-row.checked .stamp svg{ opacity:1; transform:scale(1); }
+  .item-name{ flex:1; font-size:15px; user-select:none; }
+  .item-row.checked .item-name{ text-decoration:line-through; color:var(--muted); }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty-state h3{ font-size:20px; margin-bottom:6px; color:var(--ink); }
+  .empty-state p{ font-size:14px; }
+
+  /* ---------- Hub (lists of lists) ---------- */
+  .hub-wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:16px 18px 40px;
+  }
+  .new-list-form{
+    display:flex; gap:8px;
+    margin-bottom:20px;
+  }
+  .new-list-form input{
+    flex:1;
+    padding:11px 13px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    font-size:14.5px;
+  }
+  .list-cards{ display:flex; flex-direction:column; gap:12px; }
+  .list-card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:15px 15px;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .list-card:hover{ transform:translateY(-1px); box-shadow:0 4px 14px rgba(28,43,40,0.12); }
+  .list-card-icon{
+    flex:none;
+    width:42px; height:42px;
+    border-radius:10px;
+    background:rgba(31,75,67,0.09);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--pine);
+  }
+  .list-card-icon svg{ width:20px; height:20px; stroke:currentColor; }
+  .list-card-body{ flex:1; min-width:0; cursor:pointer; }
+  .list-card-name{ font-size:16px; font-weight:600; font-family:'Fraunces', serif; }
+  .list-card-name-edit{
+    font-size:15px; padding:5px 8px; border-radius:6px; border:1px solid var(--pine-light);
+    width:100%;
+  }
+  .list-card-meta{
+    display:flex; align-items:center; gap:8px; margin-top:6px;
+  }
+  .list-card-meta .progress-track{ height:5px; }
+  .list-card-meta .progress-label{ font-size:11.5px; }
+  .list-card-actions{ display:flex; gap:2px; flex:none; }
+  .footer-credit{
+    text-align:center;
+    margin-top:30px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--line);
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(28,43,40,0.5);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:100;
+  }
+  .modal-overlay.open{ display:flex; }
+  @media (min-width:640px){ .modal-overlay{ align-items:center; } }
+  .modal{
+    background:var(--bg);
+    width:100%;
+    max-width:560px;
+    max-height:88vh;
+    border-radius:16px 16px 0 0;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 -4px 30px rgba(0,0,0,0.2);
+  }
+  @media (min-width:640px){ .modal{ border-radius:16px; max-height:82vh; } }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    border-radius:16px 16px 0 0;
+  }
+  .modal-head h2{ font-size:19px; }
+  .modal-body{ padding:16px 18px 26px; overflow-y:auto; }
+  .close-x{
+    width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent; border:none;
+  }
+  .close-x:hover{ background:var(--line); }
+  .close-x svg{ width:18px;height:18px; stroke:var(--ink); }
+
+  .tabs{ display:flex; gap:4px; background:var(--paper); padding:0 18px; border-bottom:1px solid var(--line); }
+  .tab-btn{
+    background:transparent; border:none; padding:11px 6px;
+    font-size:13.5px; font-weight:600; color:var(--muted);
+    border-bottom:2px solid transparent; margin-right:16px;
+  }
+  .tab-btn.active{ color:var(--pine); border-bottom-color:var(--mustard); }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .form-row{ display:flex; gap:8px; margin-bottom:14px; }
+  .form-row input[type=text], .form-row select{
+    flex:1; padding:9px 11px; border-radius:8px; border:1px solid var(--line);
+    background:var(--paper); font-size:14px;
+  }
+  .btn{
+    padding:9px 15px; border-radius:8px; border:none;
+    font-size:13.5px; font-weight:600; display:inline-flex;align-items:center;gap:6px;
+    flex:none;
+  }
+  .btn-primary{ background:var(--pine); color:var(--paper); }
+  .btn-primary:hover{ background:var(--pine-light); }
+  .btn-danger{ background:var(--rust); color:var(--paper); }
+  .btn-danger:hover{ opacity:.9; }
+  .btn-ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost:hover{ background:var(--line); }
+  .btn-block{ width:100%; justify-content:center; }
+
+  .manage-list{ list-style:none; margin:0; padding:0; }
+  .manage-row{
+    display:flex; align-items:center; gap:10px;
+    background:var(--paper); border:1px solid var(--line); border-radius:8px;
+    padding:9px 10px; margin-bottom:8px;
+  }
+  .manage-row.dragging{ opacity:.4; }
+  .drag-handle{ cursor:grab; flex:none; color:var(--muted); display:flex; }
+  .drag-handle svg{ width:16px;height:16px; stroke:var(--muted); }
+  .manage-row .name{ flex:1; font-size:14px; }
+  .manage-row .name-edit{ flex:1; padding:6px 8px; border:1px solid var(--pine-light); border-radius:6px; font-size:14px; }
+  .manage-row .cat-select{
+    font-size:12.5px; padding:5px 7px; border:1px solid var(--line); border-radius:6px;
+    background:var(--bg); color:var(--muted); max-width:120px;
+  }
+  .row-icon-btn{
+    background:transparent; border:none; flex:none; width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center; border-radius:6px; color:var(--muted);
+  }
+  .row-icon-btn:hover{ background:var(--line); }
+  .row-icon-btn svg{ width:15px;height:15px; stroke:currentColor; }
+  .row-icon-btn.danger:hover{ background:rgba(168,62,50,0.15); color:var(--rust); }
+
+  .section-title{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); margin:18px 0 8px;
+  }
+  .section-title:first-child{ margin-top:0; }
+
+  .data-actions{ display:flex; flex-direction:column; gap:10px; }
+  .data-note{ font-size:12.5px; color:var(--muted); margin-top:4px; }
+  .danger-zone{ margin-top:24px; padding-top:18px; border-top:1px dashed var(--line); }
+
+  .toast{
+    position:fixed; bottom:22px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--paper);
+    padding:11px 18px; border-radius:8px; font-size:13.5px;
+    box-shadow:var(--shadow); opacity:0;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:200; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .confirm-box{ text-align:center; padding:6px 4px; }
+  .confirm-box p{ color:var(--muted); font-size:14px; margin:10px 0 20px; }
+  .confirm-actions{ display:flex; gap:10px; }
+  .confirm-actions .btn{ flex:1; justify-content:center; }
+  .empty-hint{ color:var(--muted); font-size:13.5px; text-align:center; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ HUB SCREEN ============ -->
+<div class="screen active" id="hubScreen">
+  <div class="topbar">
+    <div class="brand" id="brandLogo"></div>
+    <button class="icon-btn" id="btnDataSettings" title="Dados" aria-label="Dados">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.62.5 1.15 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <div class="hero">
+    <h1>As tuas listas</h1>
+    <div class="sub">Uma lista para cada viagem, mercearia ou ocasião. Escolhe uma para começar a marcar.</div>
+  </div>
+
+  <div class="hub-wrap">
+    <div class="new-list-form">
+      <input type="text" id="newListInput" placeholder="Nome da nova lista (ex: Viagem a Lisboa)">
+      <button class="btn btn-primary" id="addListBtn">Criar</button>
+    </div>
+    <div class="list-cards" id="listCards"></div>
+    <div class="footer-credit">Powered by AKVT90</div>
+  </div>
+</div>
+
+<!-- ============ LIST SCREEN ============ -->
+<div class="screen" id="listScreen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="icon-btn" id="btnBackToHub" title="Voltar" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <span class="topbar-title" id="listTopbarTitle"></span>
+    </div>
+    <button class="icon-btn" id="btnListSettings" title="Definições da lista" aria-label="Definições da lista">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.62.5 1.15 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <div class="hero">
+    <h1 id="listHeroTitle">Lista</h1>
+    <div class="sub">Marca cada coisa à medida que a tratas. Nada fica esquecido.</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 0</div>
+    </div>
+    <button class="uncheck-link" id="btnUncheckAll">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      Desmarcar tudo
+    </button>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Pesquisar…">
+    </div>
+    <label class="filter-chip" id="filterChip">
+      <input type="checkbox" id="filterUnchecked">
+      <span>Só por marcar</span>
+    </label>
+  </div>
+
+  <div class="list-wrap" id="listWrap"></div>
+</div>
+
+<!-- ============ SETTINGS MODAL (shared) ============ -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="settingsModalTitle">Definições</h2>
+      <button class="close-x" id="closeSettings" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn" data-tab="categorias" data-modes="list">Categorias</button>
+      <button class="tab-btn" data-tab="itens" data-modes="list">Itens</button>
+      <button class="tab-btn" data-tab="dados" data-modes="hub">Dados</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="tab-panel" id="panel-categorias">
+        <div class="form-row">
+          <input type="text" id="newCategoryInput" placeholder="Nova categoria (ex: Roupa)">
+          <button class="btn btn-primary" id="addCategoryBtn">Adicionar</button>
+        </div>
+        <ul class="manage-list" id="categoryManageList"></ul>
+        <div class="empty-hint" id="categoryEmptyHint" style="display:none;">Ainda não tens categorias. Cria a primeira acima.</div>
+      </div>
+
+      <div class="tab-panel" id="panel-itens">
+        <div class="form-row">
+          <input type="text" id="newItemInput" placeholder="Novo item (ex: Carregador)">
+        </div>
+        <div class="form-row">
+          <select id="newItemCategory"></select>
+          <button class="btn btn-primary" id="addItemBtn">Adicionar</button>
+        </div>
+        <div id="itemManageGroups"></div>
+      </div>
+
+      <div class="tab-panel" id="panel-dados">
+        <div class="section-title">Backup</div>
+        <div class="data-actions">
+          <button class="btn btn-ghost btn-block" id="exportBtn">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Exportar JSON
+          </button>
+          <button class="btn btn-ghost btn-block" id="importBtn">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            Importar JSON
+          </button>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+          <div class="data-note">O ficheiro exportado inclui todas as listas. Importar adiciona apenas listas, categorias e itens que ainda não existem — nada é substituído.</div>
+        </div>
+
+        <div class="danger-zone">
+          <div class="section-title">Zona perigosa</div>
+          <button class="btn btn-danger btn-block" id="deleteAllBtn">Apagar todos os dados</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-body">
+      <div class="confirm-box">
+        <h3 id="confirmTitle">Tens a certeza?</h3>
+        <p id="confirmMessage">Esta ação não pode ser desfeita.</p>
+        <div class="confirm-actions">
+          <button class="btn btn-ghost" id="confirmCancel">Cancelar</button>
+          <button class="btn btn-danger" id="confirmOk">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORAGE_KEY = "checkbox_app_v2_data";
+
+  /* ---------- Logo / icon ---------- */
+  const LOGO_SVG = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="60" height="60" rx="16" fill="#1F4B43"/><rect x="2.75" y="2.75" width="58.5" height="58.5" rx="15.25" fill="none" stroke="#2F6358" stroke-width="1.5"/><circle cx="32" cy="32" r="19" fill="none" stroke="#D3A125" stroke-width="2.4" stroke-dasharray="3 4.2"/><path d="M21 33.5 28.5 41 44 24" fill="none" stroke="#FBF8F1" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function initLogo(){
+    document.getElementById('brandLogo').innerHTML = LOGO_SVG + '<span class="brand-name">CheckBox</span>';
+    try{
+      const encoded = btoa(unescape(encodeURIComponent(LOGO_SVG)));
+      document.getElementById('favicon').setAttribute('href', 'data:image/svg+xml;base64,' + encoded);
+    }catch(e){ /* favicon is cosmetic; ignore failures */ }
+  }
+
+  function uid(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  }
+
+  function seedState(){
+    const listViagem = uid(), listMercearia = uid();
+    const roupa = uid(), eletro = uid();
+    const frescos = uid();
+    return {
+      lists: [
+        { id: listViagem, name: "Viagem a Lisboa", order: 0 },
+        { id: listMercearia, name: "Mercearia", order: 1 }
+      ],
+      categories: [
+        { id: roupa, listId: listViagem, name: "Roupa", order: 0 },
+        { id: eletro, listId: listViagem, name: "Eletrónicos", order: 1 },
+        { id: frescos, listId: listMercearia, name: "Frescos", order: 0 }
+      ],
+      items: [
+        { id: uid(), listId: listViagem, categoryId: roupa, name: "T-shirts", checked: false, order: 0 },
+        { id: uid(), listId: listViagem, categoryId: roupa, name: "Casaco", checked: false, order: 1 },
+        { id: uid(), listId: listViagem, categoryId: eletro, name: "Carregador de telemóvel", checked: false, order: 0 },
+        { id: uid(), listId: listMercearia, categoryId: frescos, name: "Ovos", checked: false, order: 0 },
+        { id: uid(), listId: listMercearia, categoryId: frescos, name: "Leite", checked: false, order: 1 }
+      ]
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return seedState();
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.lists) || !Array.isArray(parsed.categories) || !Array.isArray(parsed.items)) return seedState();
+      return parsed;
+    }catch(e){
+      return seedState();
+    }
+  }
+
+  let state = loadState();
+  let currentListId = null; // null = hub screen
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function sortedLists(){ return [...state.lists].sort((a,b)=> a.order - b.order); }
+  function categoriesForList(listId){ return state.categories.filter(c=>c.listId===listId).sort((a,b)=> a.order - b.order); }
+  function itemsForCategory(catId){ return state.items.filter(i => i.categoryId === catId).sort((a,b)=> a.order - b.order); }
+  function itemsForList(listId){ return state.items.filter(i=>i.listId===listId); }
+  function uncategorizedItems(listId){
+    const validIds = new Set(categoriesForList(listId).map(c=>c.id));
+    return state.items.filter(i => i.listId===listId && (!i.categoryId || !validIds.has(i.categoryId))).sort((a,b)=> a.order - b.order);
+  }
+  function nextOrder(arr){ return arr.length ? Math.max(...arr.map(x=>x.order)) + 1 : 0; }
+
+  function listProgress(listId){
+    const items = itemsForList(listId);
+    const total = items.length;
+    const checked = items.filter(i=>i.checked).length;
+    return { total, checked };
+  }
+
+  /* ---------- Toast ---------- */
+  let toastTimer = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+  }
+
+  /* ---------- Confirm modal ---------- */
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const confirmTitle = document.getElementById('confirmTitle');
+  const confirmMessage = document.getElementById('confirmMessage');
+  const confirmOkBtn = document.getElementById('confirmOk');
+  const confirmCancelBtn = document.getElementById('confirmCancel');
+  let confirmCallback = null;
+
+  function askConfirm(title, message, onConfirm, okLabel){
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    confirmOkBtn.textContent = okLabel || "Confirmar";
+    confirmCallback = onConfirm;
+    confirmOverlay.classList.add('open');
+  }
+  confirmOkBtn.addEventListener('click', ()=>{
+    confirmOverlay.classList.remove('open');
+    if (confirmCallback) confirmCallback();
+    confirmCallback = null;
+  });
+  confirmCancelBtn.addEventListener('click', ()=>{
+    confirmOverlay.classList.remove('open');
+    confirmCallback = null;
+  });
+  confirmOverlay.addEventListener('click', (e)=>{
+    if (e.target === confirmOverlay){ confirmOverlay.classList.remove('open'); confirmCallback = null; }
+  });
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  /* ============================================================
+     ROUTING
+  ============================================================ */
+  function showHub(){
+    currentListId = null;
+    document.getElementById('hubScreen').classList.add('active');
+    document.getElementById('listScreen').classList.remove('active');
+    renderHub();
+  }
+
+  function openList(listId){
+    currentListId = listId;
+    document.getElementById('hubScreen').classList.remove('active');
+    document.getElementById('listScreen').classList.add('active');
+    const list = state.lists.find(l=>l.id===listId);
+    document.getElementById('listTopbarTitle').textContent = list ? list.name : '';
+    document.getElementById('listHeroTitle').textContent = list ? list.name : '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterUnchecked').checked = false;
+    document.getElementById('filterChip').classList.remove('active');
+    renderItemList();
+  }
+
+  document.getElementById('btnBackToHub').addEventListener('click', showHub);
+
+  /* ============================================================
+     HUB SCREEN
+  ============================================================ */
+  const listCardsEl = document.getElementById('listCards');
+  const newListInput = document.getElementById('newListInput');
+
+  function listCardIconSVG(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+  }
+
+  function renderHub(){
+    const lists = sortedLists();
+    if (!lists.length){
+      listCardsEl.innerHTML = '<div class="empty-state"><h3>Ainda não tens listas</h3><p>Cria a tua primeira lista acima — uma viagem, a mercearia, o que precisares.</p></div>';
+      return;
+    }
+    listCardsEl.innerHTML = lists.map(list=>{
+      const { total, checked } = listProgress(list.id);
+      const pct = total ? Math.round((checked/total)*100) : 0;
+      return `
+        <div class="list-card" data-id="${list.id}">
+          <div class="list-card-icon">${listCardIconSVG()}</div>
+          <div class="list-card-body" data-role="open">
+            <div class="list-card-name" data-role="name">${escapeHtml(list.name)}</div>
+            <div class="list-card-meta">
+              <div class="progress-track" style="flex:1;"><div class="progress-fill" style="width:${pct}%"></div></div>
+              <div class="progress-label">${checked} / ${total}</div>
+            </div>
+          </div>
+          <div class="list-card-actions">
+            <button class="row-icon-btn" data-action="edit-list" data-id="${list.id}">${pencilSVG()}</button>
+            <button class="row-icon-btn danger" data-action="delete-list" data-id="${list.id}">${trashSVG()}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('addListBtn').addEventListener('click', ()=>{
+    const name = newListInput.value.trim();
+    if (!name) return;
+    state.lists.push({ id: uid(), name, order: nextOrder(state.lists) });
+    newListInput.value = '';
+    saveState();
+    renderHub();
+  });
+  newListInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') document.getElementById('addListBtn').click(); });
+
+  listCardsEl.addEventListener('click', (e)=>{
+    const openTarget = e.target.closest('[data-role="open"]');
+    const editBtn = e.target.closest('[data-action="edit-list"]');
+    const delBtn = e.target.closest('[data-action="delete-list"]');
+    if (editBtn){
+      startInlineEditList(editBtn.dataset.id);
+    } else if (delBtn){
+      const id = delBtn.dataset.id;
+      const list = state.lists.find(l=>l.id===id);
+      const itemCount = itemsForList(id).length;
+      const msg = itemCount > 0
+        ? `A lista "${list.name}" e os seus ${itemCount} item(ns) vão ser apagados permanentemente.`
+        : `A lista "${list.name}" vai ser apagada permanentemente.`;
+      askConfirm("Apagar esta lista?", msg, ()=>{
+        state.lists = state.lists.filter(l=>l.id!==id);
+        state.categories = state.categories.filter(c=>c.listId!==id);
+        state.items = state.items.filter(i=>i.listId!==id);
+        saveState();
+        renderHub();
+        showToast("Lista apagada");
+      }, "Apagar");
+    } else if (openTarget){
+      const card = e.target.closest('.list-card');
+      openList(card.dataset.id);
+    }
+  });
+
+  function startInlineEditList(id){
+    const card = listCardsEl.querySelector(`.list-card[data-id="${id}"]`);
+    const nameEl = card.querySelector('[data-role="name"]');
+    const list = state.lists.find(l=>l.id===id);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'list-card-name-edit';
+    input.value = list.name;
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
+    function commit(){
+      const val = input.value.trim();
+      if (val) list.name = val;
+      saveState();
+      renderHub();
+    }
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') renderHub();
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  /* ============================================================
+     LIST SCREEN — item checklist
+  ============================================================ */
+  const listWrap = document.getElementById('listWrap');
+  const searchInput = document.getElementById('searchInput');
+  const filterUncheckedBox = document.getElementById('filterUnchecked');
+  const filterChip = document.getElementById('filterChip');
+
+  function checkIconSVG(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  }
+
+  function renderItemList(){
+    if (!currentListId) return;
+    const query = searchInput.value.trim().toLowerCase();
+    const onlyUnchecked = filterUncheckedBox.checked;
+
+    function passesFilter(item){
+      if (query && !item.name.toLowerCase().includes(query)) return false;
+      if (onlyUnchecked && item.checked) return false;
+      return true;
+    }
+
+    const cats = categoriesForList(currentListId);
+    let html = '';
+    let totalCount = 0, checkedCount = 0;
+
+    cats.forEach(cat=>{
+      const allItems = itemsForCategory(cat.id);
+      totalCount += allItems.length;
+      checkedCount += allItems.filter(i=>i.checked).length;
+      const visibleItems = allItems.filter(passesFilter);
+      if (allItems.length === 0) return;
+      if (visibleItems.length === 0 && (query || onlyUnchecked)) return;
+      html += renderCategoryBlock(escapeHtml(cat.name), visibleItems);
+    });
+
+    const uncategorized = uncategorizedItems(currentListId);
+    totalCount += uncategorized.length;
+    checkedCount += uncategorized.filter(i=>i.checked).length;
+    const visibleUncat = uncategorized.filter(passesFilter);
+    if (uncategorized.length > 0 && !(visibleUncat.length === 0 && (query || onlyUnchecked))) {
+      html += renderCategoryBlock("Sem categoria", visibleUncat);
+    }
+
+    if (!html){
+      if (itemsForList(currentListId).length === 0){
+        html = '<div class="empty-state"><h3>Esta lista está vazia</h3><p>Abre as Definições e adiciona os primeiros itens.</p></div>';
+      } else {
+        html = '<div class="empty-state"><h3>Nada encontrado</h3><p>Tenta outra pesquisa ou desliga o filtro.</p></div>';
+      }
+    }
+
+    listWrap.innerHTML = html;
+
+    const pct = totalCount ? Math.round((checkedCount/totalCount)*100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = checkedCount + ' / ' + totalCount;
+
+    listWrap.querySelectorAll('.item-row').forEach(row=>{
+      row.addEventListener('click', ()=> toggleItem(row.getAttribute('data-id')));
+    });
+  }
+
+  function renderCategoryBlock(name, items){
+    if (items.length === 0) return '';
+    let rows = items.map(item => `
+      <div class="item-row ${item.checked ? 'checked' : ''}" data-id="${item.id}">
+        <div class="stamp">${checkIconSVG()}</div>
+        <div class="item-name">${escapeHtml(item.name)}</div>
+      </div>
+    `).join('');
+    return `
+      <div class="category-block">
+        <div class="category-tag"><span class="dot"></span>${name}</div>
+        <div class="items-card">${rows}</div>
+      </div>
+    `;
+  }
+
+  function toggleItem(id){
+    const item = state.items.find(i=>i.id === id);
+    if (!item) return;
+    item.checked = !item.checked;
+    saveState();
+    renderItemList();
+  }
+
+  searchInput.addEventListener('input', renderItemList);
+  filterUncheckedBox.addEventListener('change', ()=>{
+    filterChip.classList.toggle('active', filterUncheckedBox.checked);
+    renderItemList();
+  });
+
+  document.getElementById('btnUncheckAll').addEventListener('click', ()=>{
+    if (!currentListId) return;
+    askConfirm(
+      "Desmarcar tudo?",
+      "Todos os itens desta lista vão voltar a ficar por marcar. Usa isto quando fores reutilizar a lista.",
+      ()=>{
+        itemsForList(currentListId).forEach(i => i.checked = false);
+        saveState();
+        renderItemList();
+        renderHub();
+        showToast("Lista reiniciada");
+      },
+      "Desmarcar tudo"
+    );
+  });
+
+  /* ============================================================
+     SETTINGS MODAL (shared: list-scoped or hub/data-scoped)
+  ============================================================ */
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsModalTitle = document.getElementById('settingsModalTitle');
+  let settingsMode = 'list'; // 'list' or 'hub'
+
+  function openSettings(mode){
+    settingsMode = mode;
+    settingsModalTitle.textContent = mode === 'hub' ? 'Dados' : 'Definições da lista';
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      const show = btn.dataset.modes === mode;
+      btn.style.display = show ? '' : 'none';
+    });
+    const firstVisible = Array.from(document.querySelectorAll('.tab-btn')).find(b=>b.dataset.modes===mode);
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    if (firstVisible){
+      firstVisible.classList.add('active');
+      document.getElementById('panel-' + firstVisible.dataset.tab).classList.add('active');
+    }
+    if (mode === 'list'){
+      renderSettingsPanels();
+    }
+    settingsOverlay.classList.add('open');
+  }
+
+  document.getElementById('btnListSettings').addEventListener('click', ()=> openSettings('list'));
+  document.getElementById('btnDataSettings').addEventListener('click', ()=> openSettings('hub'));
+  document.getElementById('closeSettings').addEventListener('click', ()=> settingsOverlay.classList.remove('open'));
+  settingsOverlay.addEventListener('click', (e)=>{ if (e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  function pencilSVG(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
+  }
+  function trashSVG(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
+  }
+  function dragHandleSVG(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg>';
+  }
+
+  /* ---------- Categories management (scoped to currentListId) ---------- */
+  const categoryManageList = document.getElementById('categoryManageList');
+  const categoryEmptyHint = document.getElementById('categoryEmptyHint');
+  const newCategoryInput = document.getElementById('newCategoryInput');
+
+  document.getElementById('addCategoryBtn').addEventListener('click', ()=>{
+    if (!currentListId) return;
+    const name = newCategoryInput.value.trim();
+    if (!name) return;
+    state.categories.push({ id: uid(), listId: currentListId, name, order: nextOrder(categoriesForList(currentListId)) });
+    newCategoryInput.value = '';
+    saveState();
+    renderSettingsPanels();
+    renderItemList();
+  });
+  newCategoryInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') document.getElementById('addCategoryBtn').click(); });
+
+  function renderCategoryManageList(){
+    if (!currentListId){ categoryManageList.innerHTML=''; return; }
+    const cats = categoriesForList(currentListId);
+    categoryEmptyHint.style.display = cats.length ? 'none' : 'block';
+    categoryManageList.innerHTML = cats.map(cat => `
+      <li class="manage-row" draggable="true" data-id="${cat.id}">
+        <span class="drag-handle">${dragHandleSVG()}</span>
+        <span class="name" data-role="name">${escapeHtml(cat.name)}</span>
+        <button class="row-icon-btn" data-action="edit-cat" data-id="${cat.id}">${pencilSVG()}</button>
+        <button class="row-icon-btn danger" data-action="delete-cat" data-id="${cat.id}">${trashSVG()}</button>
+      </li>
+    `).join('');
+    attachDragReorder(categoryManageList, (orderedIds)=>{
+      reorderArray(state.categories, orderedIds);
+      saveState();
+      renderSettingsPanels();
+      renderItemList();
+    });
+  }
+
+  categoryManageList.addEventListener('click', (e)=>{
+    const editBtn = e.target.closest('[data-action="edit-cat"]');
+    const delBtn = e.target.closest('[data-action="delete-cat"]');
+    if (editBtn){
+      startInlineEditCategory(editBtn.dataset.id);
+    } else if (delBtn){
+      const id = delBtn.dataset.id;
+      const cat = state.categories.find(c=>c.id===id);
+      const count = state.items.filter(i=>i.categoryId===id).length;
+      const msg = count > 0
+        ? `A categoria "${cat.name}" tem ${count} item(ns). Serão movidos para "Sem categoria".`
+        : `A categoria "${cat.name}" vai ser removida.`;
+      askConfirm("Remover categoria?", msg, ()=>{
+        state.categories = state.categories.filter(c=>c.id!==id);
+        state.items.forEach(i=>{ if (i.categoryId === id) i.categoryId = null; });
+        saveState();
+        renderSettingsPanels();
+        renderItemList();
+        showToast("Categoria removida");
+      }, "Remover");
+    }
+  });
+
+  function startInlineEditCategory(id){
+    const row = categoryManageList.querySelector(`li[data-id="${id}"]`);
+    const nameSpan = row.querySelector('[data-role="name"]');
+    const cat = state.categories.find(c=>c.id===id);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'name-edit';
+    input.value = cat.name;
+    nameSpan.replaceWith(input);
+    input.focus();
+    input.select();
+    function commit(){
+      const val = input.value.trim();
+      if (val) cat.name = val;
+      saveState();
+      renderSettingsPanels();
+      renderItemList();
+    }
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') renderSettingsPanels();
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  /* ---------- Items management (scoped to currentListId) ---------- */
+  const newItemInput = document.getElementById('newItemInput');
+  const newItemCategory = document.getElementById('newItemCategory');
+  const itemManageGroups = document.getElementById('itemManageGroups');
+
+  function refreshCategorySelects(){
+    if (!currentListId){ newItemCategory.innerHTML=''; return; }
+    const cats = categoriesForList(currentListId);
+    newItemCategory.innerHTML = '<option value="">— Sem categoria —</option>' +
+      cats.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  }
+
+  document.getElementById('addItemBtn').addEventListener('click', ()=>{
+    if (!currentListId) return;
+    const name = newItemInput.value.trim();
+    if (!name) return;
+    const catId = newItemCategory.value || null;
+    const siblings = catId ? itemsForCategory(catId) : uncategorizedItems(currentListId);
+    state.items.push({ id: uid(), listId: currentListId, name, categoryId: catId, checked: false, order: nextOrder(siblings) });
+    newItemInput.value = '';
+    saveState();
+    renderSettingsPanels();
+    renderItemList();
+  });
+  newItemInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') document.getElementById('addItemBtn').click(); });
+
+  function renderItemManageGroups(){
+    if (!currentListId){ itemManageGroups.innerHTML=''; return; }
+    const cats = categoriesForList(currentListId);
+    let html = '';
+    cats.forEach(cat=>{
+      const items = itemsForCategory(cat.id);
+      if (!items.length) return;
+      html += `<div class="section-title">${escapeHtml(cat.name)}</div>`;
+      html += `<ul class="manage-list" data-group="${cat.id}">` + items.map(item=>itemManageRowHtml(item)).join('') + `</ul>`;
+    });
+    const uncat = uncategorizedItems(currentListId);
+    if (uncat.length){
+      html += `<div class="section-title">Sem categoria</div>`;
+      html += `<ul class="manage-list" data-group="none">` + uncat.map(item=>itemManageRowHtml(item)).join('') + `</ul>`;
+    }
+    if (!html){
+      html = '<div class="empty-hint">Ainda não tens itens. Adiciona o primeiro acima.</div>';
+    }
+    itemManageGroups.innerHTML = html;
+
+    itemManageGroups.querySelectorAll('ul.manage-list').forEach(ul=>{
+      attachDragReorder(ul, (orderedIds)=>{
+        reorderArray(state.items, orderedIds);
+        saveState();
+        renderSettingsPanels();
+        renderItemList();
+      });
+    });
+  }
+
+  function itemManageRowHtml(item){
+    const cats = categoriesForList(currentListId);
+    const options = '<option value="">Sem cat.</option>' + cats.map(c=>
+      `<option value="${c.id}" ${c.id===item.categoryId?'selected':''}>${escapeHtml(c.name)}</option>`
+    ).join('');
+    return `
+      <li class="manage-row" draggable="true" data-id="${item.id}">
+        <span class="drag-handle">${dragHandleSVG()}</span>
+        <span class="name" data-role="name">${escapeHtml(item.name)}</span>
+        <select class="cat-select" data-action="change-cat" data-id="${item.id}">${options}</select>
+        <button class="row-icon-btn" data-action="edit-item" data-id="${item.id}">${pencilSVG()}</button>
+        <button class="row-icon-btn danger" data-action="delete-item" data-id="${item.id}">${trashSVG()}</button>
+      </li>
+    `;
+  }
+
+  itemManageGroups.addEventListener('click', (e)=>{
+    const editBtn = e.target.closest('[data-action="edit-item"]');
+    const delBtn = e.target.closest('[data-action="delete-item"]');
+    if (editBtn){
+      startInlineEditItem(editBtn.dataset.id);
+    } else if (delBtn){
+      const id = delBtn.dataset.id;
+      const item = state.items.find(i=>i.id===id);
+      askConfirm("Remover item?", `"${item.name}" vai ser removido da lista.`, ()=>{
+        state.items = state.items.filter(i=>i.id!==id);
+        saveState();
+        renderSettingsPanels();
+        renderItemList();
+        showToast("Item removido");
+      }, "Remover");
+    }
+  });
+
+  itemManageGroups.addEventListener('change', (e)=>{
+    const select = e.target.closest('[data-action="change-cat"]');
+    if (!select) return;
+    const item = state.items.find(i=>i.id===select.dataset.id);
+    const newCatId = select.value || null;
+    const siblings = newCatId ? itemsForCategory(newCatId) : uncategorizedItems(currentListId);
+    item.categoryId = newCatId;
+    item.order = nextOrder(siblings);
+    saveState();
+    renderSettingsPanels();
+    renderItemList();
+  });
+
+  function startInlineEditItem(id){
+    const row = itemManageGroups.querySelector(`li[data-id="${id}"]`);
+    const nameSpan = row.querySelector('[data-role="name"]');
+    const item = state.items.find(i=>i.id===id);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'name-edit';
+    input.value = item.name;
+    nameSpan.replaceWith(input);
+    input.focus();
+    input.select();
+    function commit(){
+      const val = input.value.trim();
+      if (val) item.name = val;
+      saveState();
+      renderSettingsPanels();
+      renderItemList();
+    }
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') renderSettingsPanels();
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  function renderSettingsPanels(){
+    renderCategoryManageList();
+    refreshCategorySelects();
+    renderItemManageGroups();
+  }
+
+  /* ---------- Drag reorder helper ---------- */
+  function attachDragReorder(listEl, onDrop){
+    let draggingEl = null;
+    listEl.querySelectorAll('li').forEach(li=>{
+      li.addEventListener('dragstart', ()=>{
+        draggingEl = li;
+        setTimeout(()=> li.classList.add('dragging'), 0);
+      });
+      li.addEventListener('dragend', ()=>{
+        li.classList.remove('dragging');
+        draggingEl = null;
+      });
+      li.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        if (!draggingEl || draggingEl === li) return;
+        const rect = li.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        li.parentNode.insertBefore(draggingEl, before ? li : li.nextSibling);
+      });
+      li.addEventListener('drop', (e)=> e.preventDefault());
+    });
+    listEl.addEventListener('dragover', (e)=> e.preventDefault());
+    listEl.addEventListener('drop', ()=>{
+      const orderedIds = Array.from(listEl.querySelectorAll('li')).map(li=>li.dataset.id);
+      onDrop(orderedIds);
+    });
+  }
+
+  function reorderArray(arr, orderedIds){
+    orderedIds.forEach((id, idx)=>{
+      const obj = arr.find(x=>x.id===id);
+      if (obj) obj.order = idx;
+    });
+  }
+
+  /* ============================================================
+     DATA: export / import / delete all (global, hub-scoped)
+  ============================================================ */
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `checkbox-${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast("JSON exportado");
+  });
+
+  const importFile = document.getElementById('importFile');
+  document.getElementById('importBtn').addEventListener('click', ()=> importFile.click());
+  importFile.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt)=>{
+      try{
+        const imported = JSON.parse(evt.target.result);
+        mergeImportedData(imported);
+      }catch(err){
+        showToast("Ficheiro inválido");
+      }
+    };
+    reader.readAsText(file);
+    importFile.value = '';
+  });
+
+  function mergeImportedData(imported){
+    if (!imported || !Array.isArray(imported.lists) || !Array.isArray(imported.categories) || !Array.isArray(imported.items)){
+      showToast("JSON inválido para esta app");
+      return;
+    }
+    const listIdMap = {};
+    const catIdMap = {};
+    let addedLists = 0, addedCats = 0, addedItems = 0;
+
+    imported.lists.forEach(ilist=>{
+      if (!ilist.name || !ilist.name.trim()) return;
+      const existing = state.lists.find(l => l.name.trim().toLowerCase() === ilist.name.trim().toLowerCase());
+      if (existing){
+        listIdMap[ilist.id] = existing.id;
+      } else {
+        const newId = uid();
+        state.lists.push({ id: newId, name: ilist.name.trim(), order: nextOrder(state.lists) });
+        listIdMap[ilist.id] = newId;
+        addedLists++;
+      }
+    });
+
+    imported.categories.forEach(icat=>{
+      if (!icat.name || !icat.name.trim()) return;
+      const resolvedListId = listIdMap[icat.listId];
+      if (!resolvedListId) return;
+      const existing = state.categories.find(c => c.listId === resolvedListId && c.name.trim().toLowerCase() === icat.name.trim().toLowerCase());
+      if (existing){
+        catIdMap[icat.id] = existing.id;
+      } else {
+        const newId = uid();
+        state.categories.push({ id: newId, listId: resolvedListId, name: icat.name.trim(), order: nextOrder(categoriesForList(resolvedListId)) });
+        catIdMap[icat.id] = newId;
+        addedCats++;
+      }
+    });
+
+    imported.items.forEach(iitem=>{
+      if (!iitem.name || !iitem.name.trim()) return;
+      const resolvedListId = listIdMap[iitem.listId];
+      if (!resolvedListId) return;
+      const resolvedCatId = iitem.categoryId ? (catIdMap[iitem.categoryId] || null) : null;
+      const alreadyExists = state.items.some(i =>
+        i.listId === resolvedListId &&
+        i.name.trim().toLowerCase() === iitem.name.trim().toLowerCase() &&
+        (i.categoryId || null) === (resolvedCatId || null)
+      );
+      if (alreadyExists) return;
+      const siblings = resolvedCatId ? itemsForCategory(resolvedCatId) : uncategorizedItems(resolvedListId);
+      state.items.push({
+        id: uid(),
+        listId: resolvedListId,
+        categoryId: resolvedCatId,
+        name: iitem.name.trim(),
+        checked: !!iitem.checked,
+        order: nextOrder(siblings)
+      });
+      addedItems++;
+    });
+
+    saveState();
+    renderHub();
+    if (currentListId) { renderSettingsPanels(); renderItemList(); }
+    showToast(`Importado: ${addedLists} lista(s), ${addedCats} categoria(s), ${addedItems} item(ns) novo(s)`);
+  }
+
+  document.getElementById('deleteAllBtn').addEventListener('click', ()=>{
+    askConfirm(
+      "Apagar todos os dados?",
+      "Isto remove todas as listas, categorias e itens permanentemente. Não é possível desfazer.",
+      ()=>{
+        state = { lists: [], categories: [], items: [] };
+        currentListId = null;
+        saveState();
+        settingsOverlay.classList.remove('open');
+        showHub();
+        showToast("Todos os dados foram apagados");
+      },
+      "Apagar tudo"
+    );
+  });
+
+  /* ---------- Init ---------- */
+  initLogo();
+  showHub();
+})();
+</script>
+</body>
+</html>
